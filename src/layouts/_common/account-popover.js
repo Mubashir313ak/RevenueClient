@@ -40,9 +40,9 @@ const OPTIONS = [
 export default function AccountPopover() {
   const router = useRouter();
 
-  const { user } = useMockedUser();
+  // const { user } = useMockedUser();
 
-  const { logout } = useAuthContext();
+  const { logout, user } = useAuthContext();
 
   const popover = usePopover();
 

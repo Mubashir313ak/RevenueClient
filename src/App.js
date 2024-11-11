@@ -52,9 +52,9 @@ export default function App() {
           <MotionLazy>
             <SettingsDrawer />
             <ProgressBar />
-            {/* <AuthConsumer> */}
-            <Router />
-            {/* </AuthConsumer> */}
+            <AuthConsumer>
+              <Router />
+            </AuthConsumer>
           </MotionLazy>
         </ThemeProvider>
       </SettingsProvider>

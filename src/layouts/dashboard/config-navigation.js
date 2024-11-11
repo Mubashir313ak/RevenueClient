@@ -49,12 +49,12 @@ export function useNavData() {
       // OVERVIEW
       // ----------------------------------------------------------------------
       {
-        subheader: 'overview v5.4.0',
+        // subheader: 'overview v5.4.0',
         items: [
-          { title: 'one', path: paths.dashboard.root, icon: ICONS.dashboard },
-          { title: 'two', path: paths.dashboard.two, icon: ICONS.ecommerce },
+          { title: 'Dashboard', path: paths.dashboard.root, icon: ICONS.dashboard },
+          { title: 'Submission', path: paths.dashboard.two, icon: ICONS.ecommerce },
           {
-            title: 'three',
+            title: 'Results',
             path: paths.dashboard.three,
             icon: ICONS.analytics,
           },
@@ -63,21 +63,21 @@ export function useNavData() {
 
       // MANAGEMENT
       // ----------------------------------------------------------------------
-      {
-        subheader: 'management',
-        items: [
-          {
-            title: 'user',
-            path: paths.dashboard.group.root,
-            icon: ICONS.user,
-            children: [
-              { title: 'four', path: paths.dashboard.group.root },
-              { title: 'five', path: paths.dashboard.group.five },
-              { title: 'six', path: paths.dashboard.group.six },
-            ],
-          },
-        ],
-      },
+      // {
+      //   subheader: 'management',
+      //   items: [
+      //     {
+      //       title: 'user',
+      //       path: paths.dashboard.group.root,
+      //       icon: ICONS.user,
+      //       children: [
+      //         { title: 'four', path: paths.dashboard.group.root },
+      //         { title: 'five', path: paths.dashboard.group.five },
+      //         { title: 'six', path: paths.dashboard.group.six },
+      //       ],
+      //     },
+      //   ],
+      // },
     ],
     []
   );

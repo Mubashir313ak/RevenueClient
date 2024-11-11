@@ -1,66 +1,80 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
+// @mui
+import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import { Typography } from '@mui/material';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+// components
+import { Grid } from '@mui/material';
+import { useSettingsContext } from 'src/components/settings';
+import AnalyticsCurrentVisits from './analytics-current-visits';
+import AnalyticsConversionRates from './analytics-conversion-rates';
 
-function CustomTabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
-  );
-}
-
-CustomTabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
+// ----------------------------------------------------------------------
 
 export default function OneView() {
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  const settings = useSettingsContext();
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Typography>Financial Tracker</Typography>
-        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-          <Tab label="Dashboard" {...a11yProps(0)} />
-          <Tab label="Monthly Reports" {...a11yProps(1)} />
-          <Tab label="Revenue Streams" {...a11yProps(2)} />
-          <Tab label="Vendors" {...a11yProps(2)} />
-        </Tabs>
-      </Box>
-      <CustomTabPanel value={value} index={0}>
-        Item One
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
-        Item Two
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={2}>
-        Item Three
-      </CustomTabPanel>
-    </Box>
+    <Container maxWidth={settings.themeStretch ? false : 'xl'}>
+      <Typography variant="h4"> Hi, Welcome back 👋</Typography>
+
+      <Grid container spacing={2} pt={3}>
+        <Grid xs={12} md={8} lg={4}>
+          <AnalyticsCurrentVisits
+            title="Category"
+            chart={{
+              series: [
+                { label: 'America', value: 4344 },
+                { label: 'Asia', value: 5435 },
+                { label: 'Europe', value: 1443 },
+                { label: 'Africa', value: 4443 },
+              ],
+            }}
+          />
+        </Grid>
+        <Grid xs={12} md={6} lg={8} pl={2}>
+          <AnalyticsConversionRates
+            title="Total Revenue by stream"
+            subheader="Our Generated Revenue"
+            chart={{
+              series: [
+                { label: 'Italy', value: 400 },
+                { label: 'Japan', value: 430 },
+                { label: 'China', value: 448 },
+                { label: 'Canada', value: 470 },
+                { label: 'France', value: 540 },
+                { label: 'Germany', value: 580 },
+              ],
+            }}
+          />
+        </Grid>
+        <Grid xs={12} md={8} lg={4} pt={2}>
+          <AnalyticsCurrentVisits
+            title="Expense by Cateogry"
+            chart={{
+              series: [
+                { label: 'America', value: 4344 },
+                { label: 'Asia', value: 5435 },
+                { label: 'Europe', value: 1443 },
+              ],
+            }}
+          />
+        </Grid>
+        <Grid xs={12} md={6} lg={8} pl={2} pt={2}>
+          <AnalyticsConversionRates
+            title="Vender Expense"
+            subheader="Our Generated Revenue"
+            chart={{
+              series: [
+                { label: 'Italy', value: 400 },
+                { label: 'Japan', value: 430 },
+                { label: 'China', value: 448 },
+                { label: 'Canada', value: 470 },
+              ],
+            }}
+          />
+        </Grid>
+      </Grid>
+    </Container>
   );
 }

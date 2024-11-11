@@ -62,8 +62,10 @@ export function AuthProvider({ children }) {
         setSession(accessToken);
 
         const response = await axios.get(endpoints.auth.me);
+        console.log('response', response);
 
-        const { user } = response.data;
+        const { user } = response.data.data;
+        console.log('user', user);
 
         dispatch({
           type: 'INITIAL',
@@ -102,8 +104,9 @@ export function AuthProvider({ children }) {
     };
 
     const response = await axios.post(endpoints.auth.login, data);
+    console.log(response);
 
-    const { accessToken, user } = response.data;
+    const { accessToken, user } = response.data.data;
 
     setSession(accessToken);
 
