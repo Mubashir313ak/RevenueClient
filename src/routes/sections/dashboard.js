@@ -9,9 +9,9 @@ import { LoadingScreen } from 'src/components/loading-screen';
 
 // ----------------------------------------------------------------------
 
-const IndexPage = lazy(() => import('src/pages/dashboard/one'));
-const PageTwo = lazy(() => import('src/pages/dashboard/two'));
-const PageThree = lazy(() => import('src/pages/dashboard/three'));
+const IndexPage = lazy(() => import('src/pages/dashboard/dashboard'));
+const PageTwo = lazy(() => import('src/pages/dashboard/revenue'));
+const PageThree = lazy(() => import('src/pages/dashboard/details'));
 const PageFour = lazy(() => import('src/pages/dashboard/four'));
 const PageFive = lazy(() => import('src/pages/dashboard/five'));
 const PageSix = lazy(() => import('src/pages/dashboard/six'));

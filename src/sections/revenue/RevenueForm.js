@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import {
   Box,
@@ -10,13 +10,25 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import DatePicker from 'react-datepicker';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import 'react-datepicker/dist/react-datepicker.css';
+import './style.css';
 import Iconify from 'src/components/iconify';
 
 function RevenueExpenseForm() {
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
   const { control, handleSubmit, register } = useForm({
     defaultValues: {
-      revenueStreams: [{ name: '', percentage: '' }],
-      expenses: [{ name: '', percentage: '' }],
+      revenueStreams: [{ name: '', percentage: '', id: '' }],
+      expenses: [{ name: '', percentage: '', id: '' }],
+      salary: '',
+      rent: '',
     },
   });
 
@@ -39,15 +51,37 @@ function RevenueExpenseForm() {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
+    console.log({ ...data, selectedDate });
   };
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit(onSubmit)}
-      sx={{ p: 4, width: '100%', mx: 'auto' }}
-    >
+    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ width: '100%', mx: 'auto' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 2 }}>
+        <Typography variant="h4">Revenue Details</Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            mr: 4,
+            border: '2px solid',
+            borderColor: '#007867',
+            borderRadius: 1,
+            p: 0.2,
+          }}
+        >
+          <Iconify icon="lsicon:calendar-outline" width={34} sx={{ pt: 0.5, color: 'red' }} />
+          <DatePicker
+            selected={selectedDate}
+            onChange={handleDateChange}
+            dateFormat="MMMM, yyyy"
+            showMonthYearPicker
+            isClearable
+            placeholderText="Select a month/year"
+            className="custom-datepicker"
+          />
+        </Box>
+      </Box>
+
       {/* Revenue Card */}
       <Card variant="outlined" sx={{ mb: 4 }}>
         <CardContent>
@@ -55,7 +89,7 @@ function RevenueExpenseForm() {
             Revenue
           </Typography>
           {revenueFields.map((field, index) => (
-            <Grid container spacing={4} key={field.id} alignItems="center">
+            <Grid container spacing={4} key={field.id} alignItems="center" sx={{ mb: 2 }}>
               <Grid item xs={5}>
                 <TextField
                   {...register(`revenueStreams.${index}.name`)}
@@ -63,17 +97,24 @@ function RevenueExpenseForm() {
                   variant="outlined"
                   fullWidth
                   defaultValue={field.name}
-                  sx={{ pt: 2 }}
+                />
+              </Grid>
+              <Grid item xs={5}>
+                <TextField
+                  {...register(`revenueStreams.${index}.id`)}
+                  label="Id"
+                  variant="outlined"
+                  fullWidth
+                  defaultValue={field.percentage}
                 />
               </Grid>
               <Grid item xs={5}>
                 <TextField
                   {...register(`revenueStreams.${index}.percentage`)}
-                  label="Percentage"
+                  label="Amount"
                   variant="outlined"
                   fullWidth
                   defaultValue={field.percentage}
-                  sx={{ pt: 2 }}
                 />
               </Grid>
               <Grid item xs={2}>
@@ -93,6 +134,7 @@ function RevenueExpenseForm() {
             color="primary"
             onClick={() => addRevenue({ name: '', percentage: '' })}
             startIcon={<Iconify icon="mingcute:add-fill" />}
+            sx={{ ml: 2, mb: 1 }}
           >
             Add New
           </Button>
@@ -106,7 +148,7 @@ function RevenueExpenseForm() {
             Expense
           </Typography>
           {expenseFields.map((field, index) => (
-            <Grid container spacing={4} key={field.id} alignItems="center">
+            <Grid container spacing={4} key={field.id} alignItems="center" sx={{ mb: 2 }}>
               <Grid item xs={5}>
                 <TextField
                   {...register(`expenses.${index}.name`)}
@@ -114,7 +156,15 @@ function RevenueExpenseForm() {
                   variant="outlined"
                   fullWidth
                   defaultValue={field.name}
-                  sx={{ pt: 2 }}
+                />
+              </Grid>
+              <Grid item xs={5}>
+                <TextField
+                  {...register(`expenses.${index}.id`)}
+                  label="Id"
+                  variant="outlined"
+                  fullWidth
+                  defaultValue={field.name}
                 />
               </Grid>
               <Grid item xs={5}>
@@ -124,14 +174,13 @@ function RevenueExpenseForm() {
                   variant="outlined"
                   fullWidth
                   defaultValue={field.percentage}
-                  sx={{ pt: 2 }}
                 />
               </Grid>
               <Grid item xs={2}>
                 <Iconify
                   icon="fluent:delete-24-regular"
                   fullWidth
-                  onClick={() => removeRevenue(index)}
+                  onClick={() => removeExpense(index)}
                   sx={{ flexShrink: 0, ml: 0.5, color: 'red' }}
                 />
               </Grid>
@@ -144,17 +193,41 @@ function RevenueExpenseForm() {
             color="primary"
             onClick={() => addExpense({ name: '', percentage: '' })}
             startIcon={<Iconify icon="mingcute:add-fill" />}
+            sx={{ ml: 2, mb: 1 }}
           >
             Add New Expense
           </Button>
         </CardActions>
       </Card>
+      {/* Rent Card */}
+      <Card variant="outlined" sx={{ mt: 4 }}>
+        <CardContent>
+          <Typography variant="h5" gutterBottom>
+            Rent
+          </Typography>
 
+          <Grid item xs={5}>
+            <TextField {...register('rent')} label="Rent" variant="outlined" fullWidth />
+          </Grid>
+        </CardContent>
+      </Card>
+      {/* Salary Card */}
+      <Card variant="outlined" sx={{ mt: 4 }}>
+        <CardContent>
+          <Typography variant="h5" gutterBottom>
+            Salary
+          </Typography>
+
+          <Grid item xs={5}>
+            <TextField {...register('salary')} label="Salaries" variant="outlined" fullWidth />
+          </Grid>
+        </CardContent>
+      </Card>
       <Button
         type="submit"
         variant="contained"
         color="success"
-        sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}
+        sx={{ mt: 4, ml: 'auto', display: 'flex', justifyContent: 'flex-end' }}
       >
         Submit
       </Button>

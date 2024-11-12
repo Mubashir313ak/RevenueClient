@@ -1,0 +1,9 @@
+.custom-datepicker {
+  width: 200px !important; /* Use !important to override default styles */
+  height: 40px;
+  font-size: 16px;
+  border: none; /* Remove border */
+  box-shadow: none; /* Remove any shadow that might appear as a border */
+  border-radius: 2px;
+  outline: none; /* Remove any outline that might appear on focus */
+}
