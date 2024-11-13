@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import {
   Box,
   Button,
@@ -12,10 +12,14 @@ import {
 } from '@mui/material';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import DatePicker from 'react-datepicker';
+import * as Yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'react-datepicker/dist/react-datepicker.css';
-import './style.css';
+import { LoadingButton } from '@mui/lab';
 import Iconify from 'src/components/iconify';
+import { CreateRevenueExpenseApi } from 'src/api/submission';
+import { validationSchema } from 'src/utils/field-validation-schemas';
 
 function RevenueExpenseForm() {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -23,15 +27,23 @@ function RevenueExpenseForm() {
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
-  const { control, handleSubmit, register } = useForm({
+
+  const {
+    control,
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
     defaultValues: {
-      revenueStreams: [{ name: '', percentage: '', id: '' }],
-      expenses: [{ name: '', percentage: '', id: '' }],
-      salary: '',
-      rent: '',
+      revenueStreams: [{ name: '', id: '', value: 0 }],
+      expenses: [{ name: '', id: '', value: 0 }],
+      salary: 0,
+      rent: 0,
+      selectedDate: null,
     },
   });
-
+  console.log('Validation Errors:', errors);
   const {
     fields: revenueFields,
     append: addRevenue,
@@ -50,8 +62,19 @@ function RevenueExpenseForm() {
     name: 'expenses',
   });
 
-  const onSubmit = (data) => {
-    console.log({ ...data, selectedDate });
+  const onSubmit = async (data) => {
+    console.log('Form Submitted:', data); // Check if this is logged
+    const formattedData = {
+      ...data,
+      selectedDate: selectedDate?.toISOString().split('T')[0], // Format date to YYYY-MM-DD
+    };
+
+    try {
+      const response = await CreateRevenueExpenseApi(formattedData);
+      console.log('Submission success:', response);
+    } catch (error) {
+      console.error('Submission error:', error);
+    }
   };
 
   return (
@@ -70,14 +93,25 @@ function RevenueExpenseForm() {
           }}
         >
           <Iconify icon="lsicon:calendar-outline" width={34} sx={{ pt: 0.5, color: 'red' }} />
-          <DatePicker
-            selected={selectedDate}
-            onChange={handleDateChange}
-            dateFormat="MMMM, yyyy"
-            showMonthYearPicker
-            isClearable
-            placeholderText="Select a month/year"
-            className="custom-datepicker"
+          <Controller
+            control={control}
+            name="selectedDate"
+            defaultValue={selectedDate}
+            render={({ field }) => (
+              <DatePicker
+                {...field}
+                selected={selectedDate}
+                onChange={(date) => {
+                  field.onChange(date);
+                  setSelectedDate(date);
+                }}
+                dateFormat="MMMM, yyyy"
+                showMonthYearPicker
+                isClearable
+                placeholderText="Select a month/year"
+                className="custom-datepicker"
+              />
+            )}
           />
         </Box>
       </Box>
@@ -96,7 +130,8 @@ function RevenueExpenseForm() {
                   label="Stream name"
                   variant="outlined"
                   fullWidth
-                  defaultValue={field.name}
+                  error={!!errors?.revenueStreams?.[index]?.name}
+                  helperText={errors?.revenueStreams?.[index]?.name?.message}
                 />
               </Grid>
               <Grid item xs={5}>
@@ -105,22 +140,23 @@ function RevenueExpenseForm() {
                   label="Id"
                   variant="outlined"
                   fullWidth
-                  defaultValue={field.percentage}
+                  error={!!errors?.revenueStreams?.[index]?.id}
+                  helperText={errors?.revenueStreams?.[index]?.id?.message}
                 />
               </Grid>
               <Grid item xs={5}>
                 <TextField
-                  {...register(`revenueStreams.${index}.percentage`)}
-                  label="Amount"
+                  {...register(`revenueStreams.${index}.value`)}
+                  label="Value"
                   variant="outlined"
                   fullWidth
-                  defaultValue={field.percentage}
+                  error={!!errors?.revenueStreams?.[index]?.value}
+                  helperText={errors?.revenueStreams?.[index]?.value?.message}
                 />
               </Grid>
               <Grid item xs={2}>
                 <Iconify
                   icon="fluent:delete-24-regular"
-                  fullWidth
                   onClick={() => removeRevenue(index)}
                   sx={{ flexShrink: 0, ml: 0.5, color: 'red' }}
                 />
@@ -132,7 +168,7 @@ function RevenueExpenseForm() {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => addRevenue({ name: '', percentage: '' })}
+            onClick={() => addRevenue({ name: '', id: '', value: '' })}
             startIcon={<Iconify icon="mingcute:add-fill" />}
             sx={{ ml: 2, mb: 1 }}
           >
@@ -152,10 +188,11 @@ function RevenueExpenseForm() {
               <Grid item xs={5}>
                 <TextField
                   {...register(`expenses.${index}.name`)}
-                  label="Vendor name"
+                  label="Expense name"
                   variant="outlined"
                   fullWidth
-                  defaultValue={field.name}
+                  error={!!errors?.expenses?.[index]?.name}
+                  helperText={errors?.expenses?.[index]?.name?.message}
                 />
               </Grid>
               <Grid item xs={5}>
@@ -164,22 +201,23 @@ function RevenueExpenseForm() {
                   label="Id"
                   variant="outlined"
                   fullWidth
-                  defaultValue={field.name}
+                  error={!!errors?.expenses?.[index]?.id}
+                  helperText={errors?.expenses?.[index]?.id?.message}
                 />
               </Grid>
               <Grid item xs={5}>
                 <TextField
-                  {...register(`expenses.${index}.percentage`)}
-                  label="Percentage"
+                  {...register(`expenses.${index}.value`)}
+                  label="Value"
                   variant="outlined"
                   fullWidth
-                  defaultValue={field.percentage}
+                  error={!!errors?.expenses?.[index]?.value}
+                  helperText={errors?.expenses?.[index]?.value?.message}
                 />
               </Grid>
               <Grid item xs={2}>
                 <Iconify
                   icon="fluent:delete-24-regular"
-                  fullWidth
                   onClick={() => removeExpense(index)}
                   sx={{ flexShrink: 0, ml: 0.5, color: 'red' }}
                 />
@@ -191,7 +229,7 @@ function RevenueExpenseForm() {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => addExpense({ name: '', percentage: '' })}
+            onClick={() => addExpense({ name: '', id: '', value: '' })}
             startIcon={<Iconify icon="mingcute:add-fill" />}
             sx={{ ml: 2, mb: 1 }}
           >
@@ -199,38 +237,41 @@ function RevenueExpenseForm() {
           </Button>
         </CardActions>
       </Card>
-      {/* Rent Card */}
-      <Card variant="outlined" sx={{ mt: 4 }}>
+
+      {/* Rent and Salary Fields */}
+      <Card variant="outlined" sx={{ mt: 2 }}>
         <CardContent>
           <Typography variant="h5" gutterBottom>
-            Rent
+            Other Information
           </Typography>
-
-          <Grid item xs={5}>
-            <TextField {...register('rent')} label="Rent" variant="outlined" fullWidth />
+          <Grid container spacing={4}>
+            <Grid item xs={6}>
+              <TextField
+                {...register('salary')}
+                label="Salary"
+                variant="outlined"
+                fullWidth
+                error={!!errors.salary}
+                helperText={errors.salary?.message}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                {...register('rent')}
+                label="Rent"
+                variant="outlined"
+                fullWidth
+                error={!!errors.rent}
+                helperText={errors.rent?.message}
+              />
+            </Grid>
           </Grid>
         </CardContent>
       </Card>
-      {/* Salary Card */}
-      <Card variant="outlined" sx={{ mt: 4 }}>
-        <CardContent>
-          <Typography variant="h5" gutterBottom>
-            Salary
-          </Typography>
 
-          <Grid item xs={5}>
-            <TextField {...register('salary')} label="Salaries" variant="outlined" fullWidth />
-          </Grid>
-        </CardContent>
-      </Card>
-      <Button
-        type="submit"
-        variant="contained"
-        color="success"
-        sx={{ mt: 4, ml: 'auto', display: 'flex', justifyContent: 'flex-end' }}
-      >
+      <LoadingButton type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
         Submit
-      </Button>
+      </LoadingButton>
     </Box>
   );
 }
