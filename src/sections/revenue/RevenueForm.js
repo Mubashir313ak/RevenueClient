@@ -9,6 +9,7 @@ import {
   Grid,
   TextField,
   Typography,
+  CircularProgress,
 } from '@mui/material';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import DatePicker from 'react-datepicker';
@@ -16,18 +17,22 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'react-datepicker/dist/react-datepicker.css';
-import { LoadingButton } from '@mui/lab';
+import { useNavigate } from 'react-router';
 import Iconify from 'src/components/iconify';
 import { CreateRevenueExpenseApi } from 'src/api/submission';
 import { validationSchema } from 'src/utils/field-validation-schemas';
+import './style.css';
+import { paths } from 'src/routes/paths';
 
 function RevenueExpenseForm() {
   const [selectedDate, setSelectedDate] = useState(null);
-
+  const [errorDate, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const handleDateChange = (date) => {
     setSelectedDate(date);
+    setError(!date); // Set error if date is null
   };
-
   const {
     control,
     handleSubmit,
@@ -35,11 +40,12 @@ function RevenueExpenseForm() {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
+    shouldFocusError: false,
     defaultValues: {
       revenueStreams: [{ name: '', id: '', value: 0 }],
       expenses: [{ name: '', id: '', value: 0 }],
-      salary: 0,
-      rent: 0,
+      salary: { value: 0 },
+      rent: { value: 0 },
       selectedDate: null,
     },
   });
@@ -61,30 +67,43 @@ function RevenueExpenseForm() {
     control,
     name: 'expenses',
   });
-
+  const adjustedDate = new Date(selectedDate);
+  adjustedDate.setMonth(adjustedDate.getMonth() + 1); // Adjust the month by 1
+  const formattedDate = adjustedDate.toISOString().split('T')[0];
   const onSubmit = async (data) => {
+    setLoading(true);
     console.log('Form Submitted:', data); // Check if this is logged
     const formattedData = {
       ...data,
-      selectedDate: selectedDate?.toISOString().split('T')[0], // Format date to YYYY-MM-DD
+      selectedDate: formattedDate,
     };
 
     try {
       const response = await CreateRevenueExpenseApi(formattedData);
       console.log('Submission success:', response);
+      navigate(paths.dashboard.root);
     } catch (error) {
       console.error('Submission error:', error);
+    } finally {
+      setLoading(false);
     }
   };
-
+  console.log('errors', errors);
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ width: '100%', mx: 'auto' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          pb: 2,
+        }}
+      >
         <Typography variant="h4">Revenue Details</Typography>
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
+            display: errors.selectedDate ? undefined : 'flex',
+            justifyContent: errors.selectedDate ? 'flex-start' : 'flex-end',
             mr: 4,
             border: '2px solid',
             borderColor: '#007867',
@@ -113,6 +132,16 @@ function RevenueExpenseForm() {
               />
             )}
           />
+          {errors.selectedDate && (
+            <Typography
+              sx={{
+                color: 'red', // You can customize this color if needed
+                mt: 1, // Adds some margin to the top for better spacing
+              }}
+            >
+              {errors.selectedDate.message}
+            </Typography>
+          )}
         </Box>
       </Box>
 
@@ -247,7 +276,7 @@ function RevenueExpenseForm() {
           <Grid container spacing={4}>
             <Grid item xs={6}>
               <TextField
-                {...register('salary')}
+                {...register('salary.value')}
                 label="Salary"
                 variant="outlined"
                 fullWidth
@@ -257,7 +286,7 @@ function RevenueExpenseForm() {
             </Grid>
             <Grid item xs={6}>
               <TextField
-                {...register('rent')}
+                {...register('rent.value')}
                 label="Rent"
                 variant="outlined"
                 fullWidth
@@ -269,9 +298,9 @@ function RevenueExpenseForm() {
         </CardContent>
       </Card>
 
-      <LoadingButton type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-        Submit
-      </LoadingButton>
+      <Button type="submit" variant="contained" color="primary" disabled={loading} sx={{ mt: 2 }}>
+        {loading ? <CircularProgress size={24} /> : 'Submit'} {/* Show loader if loading */}
+      </Button>
     </Box>
   );
 }

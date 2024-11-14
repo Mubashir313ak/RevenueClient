@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import {
   Table,
   TableBody,
@@ -9,7 +11,9 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-const SalaryAndRentDetails = () => {
+const SalaryAndRentDetails = ({ data }) => {
+  console.log(('Datdaada', data));
+
   const [priorPeriod, setPriorPeriod] = useState('');
   const [forecast, setForecast] = useState('');
   const [reportingPeriod, setReportingPeriod] = useState('');
@@ -27,7 +31,7 @@ const SalaryAndRentDetails = () => {
         </TableHead>
         <TableBody>
           <TableRow>
-            <TableCell>Salary</TableCell>
+            <TableCell>{data}</TableCell>
             <TableCell>Apple</TableCell>
             <TableCell>Apple</TableCell>
             <TableCell>
@@ -55,5 +59,7 @@ const SalaryAndRentDetails = () => {
     </TableContainer>
   );
 };
-
+SalaryAndRentDetails.propTypes = {
+  data: PropTypes.object,
+};
 export default SalaryAndRentDetails;

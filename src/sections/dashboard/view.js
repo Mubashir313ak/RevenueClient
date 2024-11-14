@@ -5,11 +5,12 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 // components
 import { Grid } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import DatePicker from 'react-datepicker';
 import { useSettingsContext } from 'src/components/settings';
 import Iconify from 'src/components/iconify';
+import { GetSubmissionByDate } from 'src/api/submission';
 import AnalyticsCurrentVisits from './analytics-current-visits';
 import AnalyticsConversionRates from './analytics-conversion-rates';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -20,10 +21,29 @@ import '../revenue/style.css';
 export default function Dashboard() {
   const settings = useSettingsContext();
   const [selectedDate, setSelectedDate] = useState(null);
-
+  const [submission, setSubmission] = useState(null);
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
+  useEffect(() => {
+    const fetchSubmission = async () => {
+      try {
+        if (selectedDate) {
+          const adjustedDate = new Date(selectedDate);
+          adjustedDate.setMonth(adjustedDate.getMonth() + 1);
+          const formattedDate = adjustedDate.toISOString().split('T')[0];
+          const data = await GetSubmissionByDate(formattedDate);
+          console.log('data', data);
+          setSubmission(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch submission:', error);
+      }
+    };
+
+    fetchSubmission();
+  }, [selectedDate]);
+  console.log('submission', submission);
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 2 }}>
@@ -57,11 +77,11 @@ export default function Dashboard() {
           <AnalyticsCurrentVisits
             title="Category"
             chart={{
-              series: [
-                { label: 'America', value: 4344 },
-                { label: 'Asia', value: 5435 },
-                { label: 'Europe', value: 1443 },
-                { label: 'Africa', value: 4443 },
+              series: submission?.data?.revenue ?? [
+                { name: 'America', value: 43 },
+                { name: 'Asia', value: 5435 },
+                { name: 'Europe', value: 1443 },
+                { name: 'Africa', value: 4443 },
               ],
             }}
           />
@@ -71,39 +91,11 @@ export default function Dashboard() {
             title="Total Revenue by stream"
             subheader="Our Generated Revenue"
             chart={{
-              series: [
-                { label: 'Italy', value: 400 },
-                { label: 'Japan', value: 430 },
-                { label: 'China', value: 448 },
-                { label: 'Canada', value: 470 },
-                { label: 'France', value: 540 },
-                { label: 'Germany', value: 580 },
-              ],
-            }}
-          />
-        </Grid>
-        <Grid xs={12} md={8} lg={4} pt={2}>
-          <AnalyticsCurrentVisits
-            title="Expense by Cateogry"
-            chart={{
-              series: [
-                { label: 'America', value: 4344 },
-                { label: 'Asia', value: 5435 },
-                { label: 'Europe', value: 1443 },
-              ],
-            }}
-          />
-        </Grid>
-        <Grid xs={12} md={6} lg={8} pl={2} pt={2}>
-          <AnalyticsConversionRates
-            title="Vender Expense"
-            subheader="Our Generated Revenue"
-            chart={{
-              series: [
-                { label: 'Italy', value: 400 },
-                { label: 'Japan', value: 430 },
-                { label: 'China', value: 448 },
-                { label: 'Canada', value: 470 },
+              series: submission?.data?.expense ?? [
+                { name: 'America', value: 43 },
+                { name: 'Asia', value: 5435 },
+                { name: 'Europe', value: 1443 },
+                { name: 'Africa', value: 4443 },
               ],
             }}
           />

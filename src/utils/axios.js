@@ -33,7 +33,6 @@ export const endpoints = {
     me: '/api/user/profile',
     login: '/api/auth/sign-in',
     register: '/api/auth/sign-up',
-    create: '/api/submission/create',
   },
   mail: {
     list: '/api/mail/list',
@@ -50,5 +49,12 @@ export const endpoints = {
     list: '/api/product/list',
     details: '/api/product/details',
     search: '/api/product/search',
+  },
+  submission: {
+    create: '/api/submission/create',
+    update: '/api/submission/create-forecast',
+    getSubmissionByDate: '/api/submission/get-submission',
+    getSubmissionByCurrentDate: '/api/submission/get-current-submission',
+    submissionDifference: '/api/submission/submission-difference',
   },
 };

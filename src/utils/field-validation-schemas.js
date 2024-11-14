@@ -20,7 +20,13 @@ export const validationSchema = Yup.object({
       })
     )
     .min(1, 'At least one expense is required'),
-  salary: Yup.number().typeError('Salary must be a number').required('Salary is required'),
-  rent: Yup.number().typeError('Rent must be a number').required('Rent is required'),
+  //   salary: Yup.number().typeError('Salary must be a number').required('Salary is required'),
+  //   rent: Yup.number().typeError('Rent must be a number').required('Rent is required'),
+  salary: Yup.object({
+    value: Yup.number().typeError('Salary must be a number').required('Salary is required'),
+  }),
+  rent: Yup.object({
+    value: Yup.number().typeError('Rent must be a number').required('Rent is required'),
+  }),
   selectedDate: Yup.date().required('Date is required'),
 });

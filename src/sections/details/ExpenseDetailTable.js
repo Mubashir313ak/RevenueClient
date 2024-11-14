@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import {
   Table,
   TableBody,
@@ -9,7 +11,7 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 
-const ExpenseDetailTable = () => {
+const ExpenseDetailTable = ({ data }) => {
   const [priorPeriod, setPriorPeriod] = useState('');
   const [forecast, setForecast] = useState('');
   const [reportingPeriod, setReportingPeriod] = useState('');
@@ -26,9 +28,9 @@ const ExpenseDetailTable = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {[1, 2, 3].map((i) => (
-            <TableRow key={i}>
-              <TableCell>{`Vendor ${i}`}</TableCell>
+          {data?.expense?.map((i) => (
+            <TableRow>
+              <TableCell>{i.name}</TableCell>
               <TableCell>Apple</TableCell>
               <TableCell>Apple</TableCell>
               <TableCell>
@@ -45,5 +47,7 @@ const ExpenseDetailTable = () => {
     </TableContainer>
   );
 };
-
+ExpenseDetailTable.propTypes = {
+  data: PropTypes.object,
+};
 export default ExpenseDetailTable;

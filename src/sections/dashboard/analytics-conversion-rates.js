@@ -14,6 +14,7 @@ export default function AnalyticsConversionRates({ title, subheader, chart, ...o
   const { colors, series, options } = chart;
 
   const chartSeries = series.map((i) => i.value);
+  console.log('chartSeries', options);
 
   const chartOptions = useChart({
     colors,
@@ -34,7 +35,11 @@ export default function AnalyticsConversionRates({ title, subheader, chart, ...o
       },
     },
     xaxis: {
-      categories: series.map((i) => i.label),
+      categories: series.map((i) => i.name),
+      labels: {
+        show: true, // Ensure the labels are visible
+        formatter: (value, index) => fNumber(series[index]?.value), // Format and show the value corresponding to the category
+      },
     },
     ...options,
   });

@@ -32,8 +32,8 @@ export default function AnalyticsCurrentVisits({ title, subheader, chart, ...oth
   const theme = useTheme();
 
   const { colors, series, options } = chart;
-
-  const chartSeries = series.map((i) => i.value);
+  console.log('series', series);
+  const chartSeries = series?.map((i) => i.value);
 
   const chartOptions = useChart({
     chart: {
@@ -42,7 +42,7 @@ export default function AnalyticsCurrentVisits({ title, subheader, chart, ...oth
       },
     },
     colors,
-    labels: series.map((i) => i.label),
+    labels: series.map((i) => i.name),
     stroke: {
       colors: [theme.palette.background.paper],
     },
