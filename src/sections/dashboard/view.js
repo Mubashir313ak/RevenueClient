@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 // components
-import { Grid } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import { useEffect, useState } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import DatePicker from 'react-datepicker';
@@ -28,9 +28,16 @@ export default function Dashboard() {
   const handleFetchData = async () => {
     try {
       if (selectedDate) {
+        // Create a new date object based on the selected date
         const adjustedDate = new Date(selectedDate);
-        adjustedDate?.setMonth(adjustedDate.getMonth() + 1);
-        const formattedDate = adjustedDate?.toISOString().split('T')[0];
+
+        // Set the date to the first day of the selected month (not the next month)
+        adjustedDate.setDate(1); // Ensure it's the first day of the selected month
+
+        // Format the adjusted date to send in the payload
+        const formattedDate = adjustedDate.toISOString().split('T')[0];
+
+        // Fetch the data with the correct date
         const data = await GetSubmissionByDate(formattedDate);
         console.log('data', data);
         setSubmission(data);
@@ -39,6 +46,7 @@ export default function Dashboard() {
       console.error('Failed to fetch submission:', error);
     }
   };
+
   console.log('submission', submission);
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
@@ -49,23 +57,35 @@ export default function Dashboard() {
             display: 'flex',
             justifyContent: 'flex-end',
             mr: 4,
-            border: '2px solid',
-            borderColor: '#007867',
-            borderRadius: 1,
+            // border: '2px solid',
+            // borderColor: '#007867',
+            // borderRadius: 1,
             p: 0.2,
           }}
         >
-          <Iconify icon="lsicon:calendar-outline" width={34} sx={{ pt: 0.5, color: 'red' }} />
-          <DatePicker
-            selected={selectedDate}
-            onChange={handleDateChange}
-            dateFormat="MMMM, yyyy"
-            showMonthYearPicker
-            showFullMonthYearPicker
-            isClearable
-            placeholderText="Select a month/year"
-            className="custom-datepicker"
-          />
+          <section className="sec">
+            <Iconify icon="lsicon:calendar-outline" width={22} sx={{ pt: 0.4, color: 'red' }} />
+            <DatePicker
+              selected={selectedDate}
+              onChange={handleDateChange}
+              dateFormat="MMMM, yyyy"
+              showMonthYearPicker
+              showFullMonthYearPicker
+              isClearable
+              placeholderText="Select a month/year"
+              className="custom-datepicker"
+            />
+          </section>
+          <Button
+            type="submit"
+            variant="contained"
+            onClick={handleFetchData}
+            color="primary"
+            width={100}
+            sx={{ ml: 1 }}
+          >
+            Export
+          </Button>
         </Box>
       </Box>
       <Grid container spacing={2} pt={3}>

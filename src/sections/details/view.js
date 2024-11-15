@@ -32,7 +32,11 @@ export default function Detail() {
       try {
         if (selectedDate) {
           const adjustedDate = new Date(selectedDate);
-          adjustedDate.setMonth(adjustedDate.getMonth() + 1);
+
+          // Set the date to the first day of the selected month (not the next month)
+          adjustedDate.setDate(1); // Ensure it's the first day of the selected month
+
+          // Format the adjusted date to send in the payload
           const formattedDate = adjustedDate.toISOString().split('T')[0];
           const data = await GetSubmissionDifference(formattedDate);
           console.log('data', data);
