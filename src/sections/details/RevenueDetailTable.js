@@ -15,28 +15,56 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { updateForecast } from 'src/api/submission';
+import { paths } from 'src/routes/paths';
 
 const RevenueDetailTable = ({ data, selectedDate }) => {
-  console.log('data', data);
-  const adjustedDate = new Date(selectedDate);
-  adjustedDate.setMonth(adjustedDate.getMonth() + 1); // Adjust the month by 1
-  const formattedDate = adjustedDate.toISOString().split('T')[0];
-  const [revenueForecasts, setRevenueForecasts] = useState([]);
-  const [expenseForecasts, setExpenseForecasts] = useState([]);
+  const navigate = useNavigate();
+
+  const formattedDate = new Date(selectedDate).toISOString().split('T')[0];
+
+  const [revenueForecasts, setRevenueForecasts] = useState(
+    data?.revenue?.map(() => ({ value: '' })) || []
+  );
+  const [expenseForecasts, setExpenseForecasts] = useState(
+    data?.expense?.map(() => ({ value: '' })) || []
+  );
   const [salaryForecast, setSalaryForecast] = useState(0);
   const [rentForecast, setRentForecast] = useState(0);
-  const [reportingPeriod, setReportingPeriod] = useState('');
-  const [error, setError] = useState('');
+
   const [loading, setLoading] = useState(false);
+
+  const handleRevenueChange = (index, value) => {
+    // Ensure the array length matches the data length
+    setRevenueForecasts((prev) => {
+      const updated = [...prev];
+      while (updated.length <= index) {
+        updated.push({ value: '' }); // Fill missing entries
+      }
+      updated[index].value = value;
+      return updated;
+    });
+  };
+
+  const handleExpenseChange = (index, value) => {
+    setExpenseForecasts((prev) => {
+      const updated = [...prev];
+      while (updated.length <= index) {
+        updated.push({ value: '' });
+      }
+      updated[index].value = value;
+      return updated;
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const forecastData = {
-      revenueForecasts,
-      expenseForecasts,
+      revenueForecasts: revenueForecasts.map((forecast) => forecast.value),
+      expenseForecasts: expenseForecasts.map((forecast) => forecast.value),
       salaryForecast,
       rentForecast,
       selectedDate: formattedDate,
@@ -45,6 +73,7 @@ const RevenueDetailTable = ({ data, selectedDate }) => {
     try {
       const response = await updateForecast(forecastData);
       console.log('Forecast updated successfully:', response);
+      navigate(paths.dashboard.root);
     } catch (errorr) {
       console.error('Failed to update forecast:', errorr);
     } finally {
@@ -67,17 +96,16 @@ const RevenueDetailTable = ({ data, selectedDate }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data?.revenue?.map((i) => (
-                <TableRow>
-                  <TableCell>{i?.name ? i?.name : ''}</TableCell>
-                  <TableCell>{i?.value ? i?.value : '0'}</TableCell>
-                  <TableCell>{i?.forecast ? i?.forecast : '0'}</TableCell>
-
+              {data?.revenue?.map((i, index) => (
+                <TableRow key={`revenue-${index}`}>
+                  <TableCell>{i?.name || ''}</TableCell>
+                  <TableCell>{i?.value || '0'}</TableCell>
+                  <TableCell>{i?.forecast || '0'}</TableCell>
                   <TableCell>
                     <TextField
-                      value={revenueForecasts}
-                      onChange={(e) => setRevenueForecasts(e.target.value)}
-                      label="name"
+                      value={revenueForecasts[index]?.value || ''}
+                      onChange={(e) => handleRevenueChange(index, e.target.value)}
+                      label="Forecast"
                     />
                   </TableCell>
                 </TableRow>
@@ -100,16 +128,16 @@ const RevenueDetailTable = ({ data, selectedDate }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data?.expense?.map((i) => (
-                <TableRow>
+              {data?.expense?.map((i, index) => (
+                <TableRow key={`expense-${index}`}>
                   <TableCell>{i?.name}</TableCell>
                   <TableCell>{i?.value}</TableCell>
-                  <TableCell>{i?.forecast ? i?.forecast : '0'}</TableCell>
+                  <TableCell>{i?.forecast || '0'}</TableCell>
                   <TableCell>
                     <TextField
                       label="Forecast"
-                      value={expenseForecasts}
-                      onChange={(e) => setExpenseForecasts(e.target.value)}
+                      value={expenseForecasts[index]?.value || ''}
+                      onChange={(e) => handleExpenseChange(index, e.target.value)}
                     />
                   </TableCell>
                 </TableRow>
