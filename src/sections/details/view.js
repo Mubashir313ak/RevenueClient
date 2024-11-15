@@ -13,16 +13,16 @@ import { useEffect, useState } from 'react';
 import { useSettingsContext } from 'src/components/settings';
 import Iconify from 'src/components/iconify';
 import RevenueDetailTable from './RevenueDetailTable';
-import ExpenseDetailTable from './ExpenseDetailTable';
-import SalaryAndRentDetails from './SalaryAndRentDetails';
+
 import '../revenue/style.css';
 // eslint-disable-next-line import/order
-import { GetSubmissionByDate, GetSubmissionDifference } from 'src/api/submission';
+import { GetSubmissionDifference } from 'src/api/submission';
 // ----------------------------------------------------------------------
 
 export default function Detail() {
   const settings = useSettingsContext();
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
   const [submission, setSubmission] = useState(null);
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -75,7 +75,7 @@ export default function Detail() {
         </Box>
       </Box>
 
-      <RevenueDetailTable data={submission?.data} />
+      <RevenueDetailTable data={submission?.data} selectedDate={selectedDate} />
     </Container>
   );
 }

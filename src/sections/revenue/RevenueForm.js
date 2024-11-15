@@ -297,10 +297,11 @@ function RevenueExpenseForm() {
           </Grid>
         </CardContent>
       </Card>
-
-      <Button type="submit" variant="contained" color="primary" disabled={loading} sx={{ mt: 2 }}>
-        {loading ? <CircularProgress size={24} /> : 'Submit'} {/* Show loader if loading */}
-      </Button>
+      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+        <Button type="submit" variant="contained" color="primary" disabled={loading} sx={{ mt: 2 }}>
+          {loading ? <CircularProgress size={24} /> : 'Submit'}
+        </Button>
+      </Box>
     </Box>
   );
 }

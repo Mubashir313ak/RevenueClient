@@ -17,6 +17,8 @@ import { useAuthContext } from 'src/auth/hooks';
 // components
 import { varHover } from 'src/components/animate';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
+import BaseOptions from 'src/components/settings/drawer/base-option';
+import { useSettingsContext } from 'src/components/settings';
 
 // ----------------------------------------------------------------------
 
@@ -39,6 +41,13 @@ const OPTIONS = [
 
 export default function AccountPopover() {
   const router = useRouter();
+  const settings = useSettingsContext();
+
+  const labelStyles = {
+    mb: 1.5,
+    color: 'text.disabled',
+    fontWeight: 'fontWeightSemiBold',
+  };
 
   // const { user } = useMockedUser();
 
@@ -93,7 +102,7 @@ export default function AccountPopover() {
       <CustomPopover open={popover.open} onClose={popover.onClose} sx={{ width: 200, p: 0 }}>
         <Box sx={{ p: 2, pb: 1.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {user?.displayName}
+            Email:
           </Typography>
 
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
@@ -103,14 +112,21 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <Stack sx={{ p: 1 }}>
+        {/* <Stack sx={{ p: 1 }}>
           {OPTIONS.map((option) => (
             <MenuItem key={option.label} onClick={() => handleClickItem(option.linkTo)}>
               {option.label}
             </MenuItem>
           ))}
-        </Stack>
-
+        </Stack> */}
+        <Box sx={{ width: '20%', justifyContent: 'center', ml: '6' }}>
+          <BaseOptions
+            value={settings.themeMode}
+            onChange={(newValue) => settings.onUpdate('themeMode', newValue)}
+            options={['light', 'dark']}
+            icons={['sun', 'moon']}
+          />
+        </Box>
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <MenuItem

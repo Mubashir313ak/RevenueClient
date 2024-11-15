@@ -12,7 +12,7 @@ export const CreateRevenueExpenseApi = async (data) => {
 };
 export const updateForecast = async (forecastData) => {
   try {
-    const response = await axios.post(endpoints.submission.create, forecastData);
+    const response = await axios.put(endpoints.submission.update, forecastData);
     return response.data;
   } catch (error) {
     console.error('Error updating forecast:', error);

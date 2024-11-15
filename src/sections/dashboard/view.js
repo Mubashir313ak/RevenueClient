@@ -20,29 +20,25 @@ import '../revenue/style.css';
 
 export default function Dashboard() {
   const settings = useSettingsContext();
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [submission, setSubmission] = useState(null);
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
-  useEffect(() => {
-    const fetchSubmission = async () => {
-      try {
-        if (selectedDate) {
-          const adjustedDate = new Date(selectedDate);
-          adjustedDate.setMonth(adjustedDate.getMonth() + 1);
-          const formattedDate = adjustedDate.toISOString().split('T')[0];
-          const data = await GetSubmissionByDate(formattedDate);
-          console.log('data', data);
-          setSubmission(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch submission:', error);
+  const handleFetchData = async () => {
+    try {
+      if (selectedDate) {
+        const adjustedDate = new Date(selectedDate);
+        adjustedDate?.setMonth(adjustedDate.getMonth() + 1);
+        const formattedDate = adjustedDate?.toISOString().split('T')[0];
+        const data = await GetSubmissionByDate(formattedDate);
+        console.log('data', data);
+        setSubmission(data);
       }
-    };
-
-    fetchSubmission();
-  }, [selectedDate]);
+    } catch (error) {
+      console.error('Failed to fetch submission:', error);
+    }
+  };
   console.log('submission', submission);
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
@@ -78,10 +74,10 @@ export default function Dashboard() {
             title="Category"
             chart={{
               series: submission?.data?.revenue ?? [
-                { name: 'America', value: 43 },
-                { name: 'Asia', value: 5435 },
-                { name: 'Europe', value: 1443 },
-                { name: 'Africa', value: 4443 },
+                { name: '', value: 0 },
+                { name: '', value: 0 },
+                { name: '', value: 0 },
+                { name: '', value: 0 },
               ],
             }}
           />
@@ -92,10 +88,10 @@ export default function Dashboard() {
             subheader="Our Generated Revenue"
             chart={{
               series: submission?.data?.expense ?? [
-                { name: 'America', value: 43 },
-                { name: 'Asia', value: 5435 },
-                { name: 'Europe', value: 1443 },
-                { name: 'Africa', value: 4443 },
+                { name: '', value: 0 },
+                { name: '', value: 0 },
+                { name: '', value: 0 },
+                { name: '', value: 0 },
               ],
             }}
           />
